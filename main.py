@@ -1,28 +1,68 @@
-from flask import Flask,redirect,url_for, render_template
+from flask import Flask, request, json
+
 app = Flask(__name__)
+print("Chương trình quản lý sinh viên Python")
 
-# @app.route('/')
-# def hello_world():
-# 	# return render_template('index.html', content = "như đầu bòi quấn rẻ")
-# 	return "<h1>lò thị vi sóng</h1>"
-
-# @app.route('/<name>')
-# def xxx(name):
-# 	if name == 'admin':
-# 		return redirect(url_for(''))
-# 	return f"<h1> hello {name}!</h1>"
-
-# @app.route('/blog/<int:blog_id>')
-# def blog(blog_id):
-# 	return f"<h1> blog {blog_id}!</h1>"
+data = [{
+    'id': '1',
+    'name': 'Nam'
+}, {
+    'id': '2',
+    'name': 'Tuan'
+}]
 
 
-@app.route("/")
-def hello_world():
-	return render_template('index.html')
+@app.route("/", methods=['POST'])
+def addstudent():
+    id = request.form.get('id')
+    name = request.form.get('name')
+
+    obj = {
+        'id': id,
+        'name': name,
+    }
+    data.append(obj)
+    print(obj)
+    return json.dumps(obj)
+
+
+@app.route("/", methods=['get'])
+def ex():
+
+    return json.dumps(data)
+
+
+@app.route("/<id>", methods=['delete'])
+def delete_student(id):
+
+    for i in range(0, len(data)-1):
+        if data[i]['id'] == id:
+            data.pop(i)
+
+    return json.dumps(data)
+
+# put dùng cập nhật lại dữ liệu (có thể đổi tên)
+@app.route("/<id>", methods=['put'])
+def update_student(id):
+
+    for i in range(0, len(data)-1):
+        if data[i]['id'] == id:
+            data[i]['name'] = request.form.get('name')
+
+    return "succesfull"
+
+
+@app.route("/<id>", methods=['get'])
+def get_studentbyid(id):
+
+    for i in range(0, len(data)-1):
+        if data[i]['id'] == id:
+            return json.dumps(data[i])
+
+    return "not found"
+
 
 
 if __name__ == '__main__':
-	app.run()
-
+    app.run(debug=True)
 
